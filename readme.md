@@ -5,7 +5,8 @@ This repository gets the scraped data from www.blockchain. which contains the in
 
 ## Start Scrapping
 
-Run init_scraping.ipynb, but before make sure the names of HTML classes from www.blockchain.com is not changed it
+Run init_scraping.ipynb, but before make sure the names of HTML classes from www.blockchain.com is not changed it.
+Paste the last data scrapped in Path **data/data_crudo.csv**
 
 to modify the HTML Clases, inspect those elements
 
