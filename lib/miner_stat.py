@@ -459,7 +459,7 @@ def partition_lost_bock():
     for i in lista:
         data_temp = data[i[0]: i[1]]
         data_temp.to_csv(
-            "}data/lost_blocks"+str(i[0])+"_"+str(i[1])+".csv")
+            "data/lost_blocks"+str(i[0])+"_"+str(i[1])+".csv")
 
 def coy_file():
     import shutil
