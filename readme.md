@@ -5,19 +5,23 @@ This repository gets the scraped data from www.blockchain. which contains the in
 
 ## Start Scrapping
 
-Run init_scraping.ipynb, but before make sure the names of HTML classes from www.blockchain.com is not changed it.
+Run init_scraping.ipynb, but before make sure the names of HTML classes from www.blockchain.com. is not changed it.
 Paste the last data scrapped in Path **data/data_crudo.csv**
 
-to modify the HTML Clases, inspect those elements
+to modify the HTML Clases, inspect those elements and set al te values in conf.ini
 
-    class html_class:
-        
-        height_link = HTML CLASS HEIGH NUMBER
-        div_table = HTML CLASS OF ALL TABLE
-        left_column_table = HTML CLASS LEFT COLUMN
-        right_column_table = HTML CLASS RIGHT COLUMN
-        miner_name = MINER NAME RIGHT COLUMN
+    [HTMl_Class]
+    height_link = HTML CLASS HEIGH NUMBER
+    div_table = HTML CLASS OF ALL TABLE
+    left_column_table = HTML CLASS LEFT COLUMN
+    right_column_table = HTML CLASS RIGHT COLUMN
+    miner_name = MINER NAME RIGHT COLUMN
+    
+in also you can replace the Path where is located the last data-set and Uni_data folder if you want it.
 
+    [Dir]
+    data_crudo = Path where is located your data set: example:  data/data_crudo.csv 
+    uni_data = Path where is locate Uni_data example:  data/uni_data/
 - - - 
 ## Miners rewards history Dataset
 
