@@ -18,7 +18,8 @@ class html_class:
 
 class dir_:
     # Path where is locate the last data & Path save new one
-    last_data = 'data/data_crudo.csv'
+    data_crudo = 'data/data_crudo.csv'
+    uni_data = 'data/uni_data/'
 
 def pool_pie():
     # Español
@@ -171,17 +172,18 @@ def scrapper_update():
     stats = blockchain_stats()
     n_range_block = stats.get("n_blocks_total")
 
-    if os.path.exists(dir_.last_data):
+    if os.path.exists(dir_.data_crudo):
 
-        data_old = pd.read_csv( dir_.last_data )
-        data_old.to_csv( dir_.last_data )
+        data_old = pd.read_csv( dir_.data_crudo )
+        data_old.to_csv( dir_.data_crudo )
         print("diferencias de bloques ", n_range_block, max( data_old["Height"] ))
         n_range_block = n_range_block - max( data_old["Height"] )
         print( n_range_block )
         # Verificando si la Tabla esta Actualizada
         # Checking if the Table is Updated
 
-        if n_range_block == 0: return print("Los datos estan actualizados al ultimo Bloque Minado ", n_range_block )  
+        if n_range_block == 0: 
+            return print("Los datos estan actualizados al ultimo Bloque Minado :" + str(n_range_block) )  
         
         n_pages = math.ceil( n_range_block / 50 )
         # Iniciando el scrapper 
@@ -192,7 +194,7 @@ def scrapper_update():
         else:
             df_new = last_scrpapping( df, dr, n_range_block )      
             df_suma = table_save_update( df_new, data_old)      
-        df_suma.to_csv( dir_.last_data )
+        df_suma.to_csv( dir_.data_crudo )
     else:
         print("No se puede ejecutar todo el scrappeo, tomaria mucho tiempo puedes ejecutar la Func: scrapper_partitions ",
             " donde puedes particionar el scrapper")
@@ -232,12 +234,12 @@ def scrapper_partitions(page_init,n_times):
 
         df, dr = block_scrapper_pages( n_pages_1, n_range_block )
         df_new = last_scrpapping(df, dr, n_range_block)
-        df_new.to_csv("data/data_" + str(page_init) + "_" + str(page_init + n_times) + ".csv")
+        df_new.to_csv( dir_.uni_data +"data_" + str(page_init) + "_" + str(page_init + n_times) + ".csv")
         
         s = input("¿Desea unir todas las los datos particionados? SI: Presione cualquier tecla")
         if s != "":
-            uni_table("blockchain data/bc data/scrapper partition data")
-            print("La data sea creado satisfactoriamente blockchain data/bc data/old data/data_crudo.csv")
+            uni_table( dir_.uni_data )
+            print("La data sea creado satisfactoriamente")
             return
 
         return print("EL Scrappeo se efectuo exitosamente: ", page_init, "-" ,page_init + n_times)
@@ -393,7 +395,7 @@ def uni_table(direc):
 
 def read_data():
 
-    data = pd.read_csv( dir_.last_data )
+    data = pd.read_csv( dir_.data_crudo )
     if 'Unnamed: 0' in data:
         data.drop(data.columns[data.columns.str.contains(
             'unnamed', case=False)], axis=1, inplace=True)
@@ -408,7 +410,7 @@ def concat_partition_data():
     # Then concattenate with the main data
 
     data_old = read_data()
-    data_new = uni_table("data/uni_data/")
+    data_new = uni_table( dir_.uni_data )
 
     if data_new != []:
       data_new = data_old.append(data_new)
@@ -435,7 +437,7 @@ def concat_lost_block():
         data_new["Height"] = data_new["Height"].astype(int)
         data_new = data_new.sort_values(by=['Height'], ascending=False)
         data_new = data_new.drop_duplicates("Height")
-        data_new.to_csv( dir_.last_data )
+        data_new.to_csv( dir_.data_crudo )
         print("Guardado en blockchain data/data_crudo.csv")
 
     else:
