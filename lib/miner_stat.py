@@ -8,6 +8,25 @@ import math
 from bs4 import BeautifulSoup
 import configparser
 
+
+# If You are using Collab, coment init_cof() Fun, and if name---- and use the class
+
+# class html_class:
+#     # Default Classes, but before run it, check all the class in the page
+
+#     height_link = 'sc-1r996ns-0 fLwyDF sc-1tbyx6t-1 kCGMTY iklhnl-0 eEewhk'
+#     div_table = 'hnfgic-0 enzKJw'
+#     left_column_table = 'sc-1ryi78w-0 cILyoi sc-16b9dsl-1 ZwupP sc-1n72lkw-0 ebXUGH'
+#     right_column_table = 'sc-1ryi78w-0 cILyoi sc-16b9dsl-1 ZwupP u3ufsr-0 eQTRKC'
+#     miner_name = 'sc-1r996ns-0 fLwyDF sc-1tbyx6t-1 kCGMTY iklhnl-0 eEewhk'
+
+
+# class dir_:
+#     # Path where is locate the last data & Path save new one
+#     data_crudo = 'data/data_crudo.csv'
+#     uni_data = 'data/uni_data/'
+
+
 def init_conf():
   read_config = configparser.ConfigParser(allow_no_value=True)
   conf_dir = os.path.join(os.path.realpath(''), 'conf.ini')
