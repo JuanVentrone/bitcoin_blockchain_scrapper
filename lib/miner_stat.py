@@ -51,7 +51,6 @@ def pool_pie():
     # English
     # An estimation of hashrate distribution amongst the largest mining pools.
     # Based on a percentage of the blocks mined for each Pool
-
     url_pool= "https://api.blockchain.info/pools?timespan=7days"
     r = requests.get(url_pool)
     datos_json = r.json()
@@ -66,18 +65,16 @@ def blockchain_stats():
     # Informacion En estadistica del Blockchain
     # English 
     # Info Blockchain Stats
-
     url_pool = "https://api.blockchain.info/stats"
     r = requests.get( url_pool )
     datos_varios = r.json() 
     return datos_varios
 
 def block_scrapper_pages( n_pages_1, n_range_block ):
-
     # Español
     # Escrapea https://www.blockchain.com/btc/blocks Extae valores de cada Bloque
     # Englisg
-    # Scrapper https://www.blockchain.com/btc/blocks Get Values from the each Block
+    # Scrapper https://www.blockchain.com/btc/blocks Get Values from each Block
     if type(n_pages_1) == tuple:  n_pages_1 = range( n_pages_1[ 0 ], n_pages_1[ -1 ] )
     if type(n_pages_1) == int:    n_pages_1 = range( 0, n_pages_1 )
     data_temp=[]
@@ -198,7 +195,6 @@ def scrapper_update():
     if os.path.exists(dir_.data_crudo):
 
         data_old = pd.read_csv( dir_.data_crudo )
-        data_old.to_csv( dir_.data_crudo )
         print("diferencias de bloques ", n_range_block, max( data_old["Height"] ))
         n_range_block = n_range_block - max( data_old["Height"] )
         print( n_range_block )
@@ -211,37 +207,25 @@ def scrapper_update():
         n_pages = math.ceil( n_range_block / 50 )
         # Iniciando el scrapper 
         # Scrapper Innit
-
         df, dr = block_scrapper_pages ( n_pages, n_range_block )
-        if dr == []: df_suma = table_save_update(df,data_old)
+        
+        if dr == []:
+              df_suma = pipe_data(data_old, df)
         else:
             df_new = last_scrpapping( df, dr, n_range_block )      
-            df_suma = table_save_update( df_new, data_old)      
+            df_suma = pipe_data(data_old, df_new)
         df_suma.to_csv( dir_.data_crudo )
     else:
         print("No se puede ejecutar todo el scrappeo, tomaria mucho tiempo puedes ejecutar la Func: scrapper_partitions ",
             " donde puedes particionar el scrapper")
-
-    return print("Funcion scrapper_update COmpleta")
-
-def table_save_update(df_new,data_old):
-
-    df_suma = df_new.append( data_old )
-    df_suma = df_suma.sort_values( by=['Height'], ascending=False )
-    df_suma = df_suma.drop_duplicates("Height")
-    if 'Unnamed: 0' in df_suma:
-        df_suma.drop( df_suma.columns[df_suma.columns.str.contains('unnamed', case = False )], axis = 1, inplace = True )
-    df_suma = df_suma.dropna()
-    return df_suma
+    return print("Funcion scrapper_update Completa")
     
 def scrapper_partitions(page_init,n_times):
-    
     # Español:
     # Ejecuta si la tabla esta actualizada o no, para escoger que se debe scrappear
     # page_init: Es el valor donde quieres que empiece el Scrapper
     # n_times: es la posicion final que deseas que termine el Scrappeo
     # Ejemplo: si n_pages_1 empieza en 1000 y n_pages_2 es 200, Scrappea desde el 1000 hasta el 1200
-
     # English
     # Run if the table is updated or not, to choose what should be scrapper
     # page_init: Is the value pages that you want to start it.
@@ -317,8 +301,8 @@ def scrapper_lost_block():
             data_temp = data_temp.sort_values( by=['Height'], ascending=False )
             data_temp = data_temp.drop_duplicates("Height")
             if 'Unnamed: 0' in data_temp: data_temp.drop( data_temp.columns[data_temp.columns.str.contains('unnamed',case = False)], axis = 1, inplace = True )
-            data_temp = data_temp.dropna()
-            data_temp.to_csv("data/find_block" + str(n_range_block) + ".csv")
+            data_temp.dropna(subset=["Height"], inplace=True)
+            data_temp.to_csv("data/uni_data/find_block" + str(n_range_block) + ".csv")
             print("Proceso Exitosamente Finalizado")
             
             
@@ -403,18 +387,16 @@ def uni_table(direc):
         if not dir.startswith('.'):
           director.append(dir)
     if director != []:
-      for i in director:
-
+      for i in director:   
           try:
-              data_temp = pd.read_csv(direc + i)
+              data_temp = pd.read_csv(str( direc + i ))
               data = data.append(data_temp)
               g = graph_bar(g)
           except:
-              print("No se pudo concatenar:", direc + i)
+              print("No se pudo concatenar:", str( direc + i ))
               pass
-      return director
-    else:
-        return []
+              
+    return data
 
 def read_data():
 
@@ -435,34 +417,24 @@ def concat_partition_data():
     data_old = read_data()
     data_new = uni_table( dir_.uni_data )
 
-    if data_new != []:
-      data_new = data_old.append(data_new)
-      data_new["Height"] = data_new["Height"].astype(int)
-      data_new = data_new.sort_values(by=['Height'], ascending=False)
-      data_new = data_new.drop_duplicates("Height")
-      data_new.to_csv("data/partition_data_crudo.csv")
-      print("Guardado en blockchain data/bc data/partition_data_crudo.csv")
+    if not data_new.empty:
+      data_new = pipe_data(data_old, data_new)
+      data_new.to_csv("data/partition_manual_data_crudo.csv")
+      print("Guardado data/partition_data_crudo.csv")
 
     else:
       return print("La Lista esta Vacia")
 
 def concat_lost_block():
-
     # Concatena todos los datos faltantes ya escrappeados
     # con la data principal
-    #
     # Concatenate all missing and scrapped data with the main data
-
     data_old = read_data()
-    data_new = uni_table("data/new data/")
-    if data_new != []:
-        data_new = data_old.append(data_new)
-        data_new["Height"] = data_new["Height"].astype(int)
-        data_new = data_new.sort_values(by=['Height'], ascending=False)
-        data_new = data_new.drop_duplicates("Height")
+    data_new = uni_table("data/uni_data/")
+    if not data_new.empty:
+        data_new = pipe_data(data_old, data_new)
         data_new.to_csv( dir_.data_crudo )
         print("Guardado en blockchain data/data_crudo.csv")
-
     else:
         return print("La Lista esta Vacia")
 
@@ -478,7 +450,7 @@ def partition_lost_bock():
     for i in lista:
         data_temp = data[i[0]: i[1]]
         data_temp.to_csv(
-            "data/lost_blocks"+str(i[0])+"_"+str(i[1])+".csv")
+            "data/lost_blocks/"+str(i[0])+"_"+str(i[1])+".csv")
 
 def coy_file():
     import shutil
@@ -487,19 +459,31 @@ def coy_file():
                     "data/data_update_"+str(date.today())+".csv")
     print("Data Actualizada")
 
+def pipe_data(data_old, data_new):
+    data_new = data_old.append(data_new)
+    data_new.dropna(subset=["Height"], inplace=True)
+    data_new["Height"] = data_new["Height"].astype(int)
+    data_new = data_new.drop_duplicates("Height")
+    data_new = data_new.sort_values(by=['Height'], ascending=False)
+    if 'Unnamed: 0' in data_new:
+        data_new.drop(data_new.columns[data_new.columns.str.contains(
+                'unnamed', case=False)], axis=1, inplace=True)
+    return data_new
+
 def init_update():
     scrapper_update()
     find_lost_block()
-    if os.path.exists(lost_rang_data):
+    if os.path.exists("data/rang_lost_blocks.csv"):
         scrapper_lost_block()
         concat_lost_block()
-        os.remove(lost_rang_data)
+        os.remove("data/rang_lost_blocks.csv")
         find_lost_block()
-    if os.path.exists(lost_rang_data):
+    if os.path.exists("data/rang_lost_blocks.csv"):
         return print("ADVERTENCIA: puede haber algun error en la da data_crudo.csv, por favor chequear")
     else:
         coy_file()
         return print("Actualizado Por favor revisar")
+
 
 
 if __name__ == "__main__":
