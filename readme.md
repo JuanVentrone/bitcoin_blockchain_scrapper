@@ -1,7 +1,7 @@
 
 <img src="images/miner_stats.png" style="margin: 0px 20%;"></img>
 
-This repository gets the scraped data from www.blockchain. which contains the information of the historical mined block.
+This repository gets the scraped data from www.blockchain.com which contains the information of the historical mined block.
 
 ## Start Scrapping
 
